@@ -1,0 +1,227 @@
+---
+format:
+  html:
+    page-layout: full
+    toc: false
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+
+theme_set(
+theme_minimal(base_size = 18) +
+theme(
+plot.title = element_text(face = "bold"),
+axis.title = element_text(face = "bold"),
+panel.grid.minor = element_blank()
+)
+)
+
+```
+
+```{=html}
+<style>
+/* Print size */
+@page { size: A2 landscape; margin: 6mm; }
+
+/* Remove Quarto default max-width/margins so the poster fills the page */
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+main, .content, .page-columns, .page-layout, .quarto-container, #quarto-content {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Overall poster padding (small, so it fills the page) */
+.poster-wrap {
+}
+
+body {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+/* Header (gray background, centered, NO rounded corners) */
+.header {
+  position: relative;
+  background: #f0f0f0;
+  padding: 22px 28px;
+  margin-bottom: 18px;
+  border-radius: 0;          /* <-- no rounded corners */
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 44px;
+  font-weight: 700;
+}
+
+.header .subtitle {
+  margin-top: 8px;
+  font-size: 20px;
+}
+
+.header .authors {
+  margin-top: 10px;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Logo inside header, top-right */
+.header .logo {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  width: 110px;
+  height: auto;
+}
+
+/* Force 4 columns always (no responsive collapsing) */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+/* Cards */
+.card {
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  padding: 14px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,.05);
+}
+
+.card h2 {
+  margin: 0 0 8px 0;
+  font-size: 20px;
+}
+
+/* Make plots fit */
+img, svg, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+
+.card.abstract-box{
+  border: 3px solid #9e9e9e;
+  background-color: #f2f2f2;
+  border-radius: 16px; 
+}
+
+/* optional: Überschriftfarbe */
+.card.abstract-box h2{
+  color:#555;
+}
+
+
+</style>
+
+<div class="poster-wrap">
+
+  <div class="header">
+    <img class="logo" src="images/uzh-logo-black.png" alt="UZH Logo">
+
+<h2>Zusammenhang zwischen sozialer Ungleichheit und Vertrauen in demokratische Institutionen</h2>
+
+<div class="subtitle">
+  Universität Zürich – Institut für Politikwissenschaften – Fortgeschrittene Statistik HS2025
+</div>
+
+<div class="authors">
+  Elena Mara Wagen, Enric Valentino Rüthemann, Fabienne Eliska Borer,
+  Jannik Andreas Richter, Julius Pär Niklas Wiesinger &amp; Tin Mettler
+</div>
+
+  </div>
+
+  <div class="grid">
+
+
+<!-- SPALTE 1 -->
+
+
+<div>
+  <div class="card abstract-box">
+    <h2>Abstract</h2>
+    Diese Forschungsarbeit untersucht den Zusammenhang zwischen sozialer Ungleichheit und Vertrauen in demokratische Institutionen in europäischen Ländern - genauer das Vertrauen in nationale Parlamente, nationale Parteien sowie das Europäische Parlament. Für die Analyse wird ein Mehrebenenmodell mit unit fixed effects verwendet. Es zeigt sich, dass...
+    </div>
+
+  <div class="card">
+    <h2>Theorie &amp; Hypothesen</h2>
+    Hypothese: Eine hohe soziale Ungleichheit führt zu abnehmendem Vertrauen in demokratische Institutionen in Europa."
+Nullhypothese:
+
+  </div>
+</div>
+
+<!-- SPALTE 2 -->
+<div>
+  <div class="card">
+    <h2>Daten</h2>
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem.
+  </div>
+
+  <div class="card">
+    <h2>Methodik</h2>
+    <p>
+    Es werden Variabeln aus verschiedenen Datensätzen verwendet. Als unabhängige Variable wird die Variable "pretran_gini" aus dem Comparative Political Data Set verwendet. Als abhängige Variablen dienen die Variabeln:
+<ul>
+  <li><strong>trstprl</strong> (trust in country's parliament)</li>
+  <li><strong>trstprt</strong> (trust in political parties)</li>
+  <li><strong>trstep</strong> (trust in the European Parliament)</li>
+</ul>aus dem ESS10-Datensatz.
+</p>
+
+<p>
+Als Kontrollvariabeln werden
+<ul>
+<li><strong>agea</strong> (age of respondent, calculated)</li>
+<li><strong>edulvlb</strong> (highest level of education)</li></ul>
+verwendet.
+</p>
+
+<p>
+Es wird ein Mehrebenenmodell mit unit fixed effects verwendet. -> Input Steenbergen: Erklären warum Unit Fixed Effekts notwendig sind in ein Mehrebenemodell Anderseits ist es auch nicht falsch fixed Effects für die Länder zu rechnen, aber mann würde es dann einfach kein Mehrebenemodell mehr nennen.
+</p>
+  </div>
+</div>
+
+<!-- SPALTE 3 -->
+<div>
+  <div class="card">
+    <h2>Berechnungen &amp; R-Code</h2>
+
+  </div>
+</div>
+
+<!-- SPALTE 4 -->
+<div>
+  <div class="card">
+    <h2>Resultate & Konklusion</h2>
+     <img src="images/vertrauen_ep.png" alt="Vertrauen Europäisches Parlament" style="margin-bottom: 12px;">
+
+    <img src="images/vertrauen_np.png" alt="Vertrauen Nationale Parlamente" style="margin-bottom: 12px;">
+
+    <img src="images/vertrauen_parteien.png" alt="Vertrauen Politische Parteien">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem.
+    Augeri amplificarique non possit.
+  </div>
+</div>
+```

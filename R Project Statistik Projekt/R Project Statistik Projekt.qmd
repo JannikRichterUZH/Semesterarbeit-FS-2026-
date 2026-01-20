@@ -1,0 +1,366 @@
+---
+lang: de
+resources:
+  - images/**
+format:
+  html:
+    page-layout: full
+    toc: false
+    embed-resources: true
+execute:
+  echo: false
+  warning: false
+  message: false
+bibliography: references.bib
+---
+
+```{r}
+library(quarto)
+library(webshot2)
+library(tidyverse)
+library(ggplot2)
+
+theme_set(
+theme_minimal(base_size = 18) +
+theme(
+plot.title = element_text(face = "bold"),
+axis.title = element_text(face = "bold"),
+panel.grid.minor = element_blank()
+)
+)
+
+```
+
+```{=html}
+<style>
+@page { size: A2 landscape; margin: 0mm; }
+
+:root{
+  --page-w: 594mm;
+  --page-h: 420mm;
+
+  --gap: 12mm;
+  --col-count: 4;
+
+  --base-font: 12pt;
+  --line: 1.25;
+
+  --side-pad: 12mm;        /* gleiche linke/rechte Kante für Header + Cards */
+  --content-pad-v: 10mm;
+  --header-gap: 10mm;      /* Abstand unter dem Header */
+  
+  --footer-h: 2mm;   /* Höhe der unteren Zone */
+}
+
+
+html, body { margin: 0 !important; padding: 0 !important; }
+main, .content, .page-columns, .page-layout, .quarto-container, #quarto-content {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body{
+  font-size: var(--base-font);
+  line-height: var(--line);
+}
+
+/* Poster füllt exakt A2 */
+.poster-wrap{
+  width: var(--page-w);
+  height: var(--page-h);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header{
+  position: relative;
+  background: #f0f0f0;
+  padding: 18mm;
+  text-align: center;
+  margin: 0 var(--side-pad) var(--header-gap) var(--side-pad); /* <- Abstand unten */
+}
+
+.header h2{
+  margin: 0;   /* <- wieder normal */
+  font-size: 34pt;
+  font-weight: 700;
+}
+
+.header .subtitle{
+  margin-top: 6mm;
+  font-size: 16pt;
+}
+
+.header .authors{
+  margin-top: 5mm;
+  font-size: 10.5pt;
+  font-style: italic;
+}
+
+.header .logo{
+  position: absolute;
+  top: 10mm;
+  right: 12mm;
+  width: 32mm;
+  height: auto;
+}
+
+
+.footer{
+  margin: 0 var(--side-pad);
+  height: var(--footer-h);
+  box-sizing: border-box;
+
+  /* damit es wirklich unten sitzt */
+  margin-top: auto;
+}
+
+.footer-inner{
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;   /* rechts unten */
+  gap: 10mm;
+}
+
+
+/* Multi-Columns */
+
+.flow{
+  flex: 1;           /* nimmt die Resthöhe unter dem Header */
+  min-height: 0;     /* wichtig in Flex-Layouts, sonst Overflow-Bugs */
+  overflow: hidden;  /* bleibt: verhindert "unendlich nach unten" */
+
+  box-sizing: border-box;
+  margin: 0 var(--side-pad);
+  padding: var(--content-pad-v) 0 calc(var(--content-pad-v) + var(--footer-h)) 0;
+
+  column-count: var(--col-count) !important;
+  -webkit-column-count: var(--col-count) !important;
+
+  column-gap: var(--gap) !important;
+  -webkit-column-gap: var(--gap) !important;
+
+  column-width: auto !important;
+  -webkit-column-width: auto !important;
+
+  column-fill: auto !important;  /* links->rechts füllen, nicht "balance" */
+}
+
+
+@media print{
+  /* Multi-Column-Verhalten im Print stabilisieren */
+  .flow{
+    column-fill: auto;
+  }
+
+  html, body{
+    width: 594mm !important;
+    height: 420mm !important;
+    margin: 0 !important;   /* keine Browser-Ränder */
+  }
+
+  /* Farben wirklich drucken */
+  *{
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Poster exakt oben links platzieren (nicht zentrieren) */
+  .poster-wrap{
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+}
+
+  
+
+/* Cards */
+.card{
+  /* Card darf umbrechen */
+  break-inside: auto;
+  -webkit-column-break-inside: auto;
+  hyphens:auto; 
+  -webkit-hyphens:auto;
+  page-break-inside: auto;
+  
+
+  /* Optik: dünner Rand */
+  border: 1px solid #9e9e9e;   /* dünn, ähnlich Abstract */
+  border-radius: 12px;
+  box-shadow: none;            /* Shadow weg, der wirkt wie “dicker Rand” */
+  background: white;
+  padding: 6mm;
+  margin-bottom: 6mm; 
+}
+
+.card p, .card li{
+  hyphens: auto;
+}
+
+.card h2{
+  text-align: left;  /* explizit */
+  margin: 0 0 6mm 0;
+  font-size: 18pt;
+  break-after: avoid;
+  page-break-after: avoid;
+  margin: 0 0 6mm 0;
+
+}
+
+
+/* Abstract */
+.card.abstract-box{
+  border: 3px solid #9e9e9e;
+  background-color: #f2f2f2;
+  border-radius: 16px;
+}
+.card.abstract-box h2{ color:#555; }
+
+/* Screen: Preview nicht riesig, aber 4 Spalten bleiben */
+@media screen{
+  body{ background: #fff; }
+
+  .poster-wrap{
+    width: 594mm;
+    height: 420mm;
+    margin: 0 auto;
+  }
+
+  .flow{
+    overflow: hidden;
+    column-fill: auto;
+    padding: var(--content-pad-v) 0 calc(var(--content-pad-v) + var(--footer-h)) 0;
+  }
+}
+
+
+.poster-link{
+  color: #666666;           /* dezentes Grau */
+  text-decoration: underline;
+  font-size: inherit;       /* gleiche Schriftgrösse wie Text */
+  font-family: inherit;     /* gleiche Schriftart */
+}
+
+.poster-link:hover{
+  color: #333333;           /* etwas dunkler beim Hover */
+}
+</style>
+
+<div class="poster-wrap">
+
+  <div class="header">
+    <img class="logo" src="images/uzh-logo-black.png" alt="UZH Logo">
+
+
+<h2>Zusammenhang zwischen sozialer Ungleichheit und Vertrauen in demokratische Institutionen</h2>
+
+<div class="subtitle">
+  Universität Zürich – Institut für Politikwissenschaften –  Fortgeschrittene Methoden und Statistik (HS2025)
+</div>
+
+<div class="authors">
+  Elena Mara Wagen, Enric Valentino Rüthemann, Fabienne Eliska Borer,
+  Jannik Andreas Richter, Julius Pär Niklas Wiesinger und Tin Mettler
+</div>
+
+
+  </div>
+
+  <!-- HIER: alle Karten direkt hintereinander -->
+
+  <div class="flow">
+
+
+<div class="card abstract-box">
+  <h2>Abstract</h2>
+  Diese Studie untersucht den Zusammenhang zwischen sozialer Einkommensungleichheit und dem Vertrauen in demokratische Institutionen
+in europäischen Ländern. Auf Basis von Daten aus der European Social Survey (ESS), Runde 10 (2020–2022), wird das Vertrauen in nationale Parlamente, politische Parteien und das Europäische Parlament analysiert. Einkommensungleichheit wird mithilfe des Gini-Koeffizienten auf Länderebene gemessen. Zur Berücksichtigung der hierarchischen Datenstruktur werden lineare Mehrebenenmodelle mit zufälligen Länder-Intercepts geschätzt. Die Ergebnisse zeigen keinen robusten statistischen Zusammenhang zwischen Einkommensungleichheit und politischem Vertrauen über alle drei Institutionen hinweg. Stattdessen weisen individuelle Merkmale, insbesondere Bildungsjahre, konsistente positive Effekte auf.
+</div>
+
+<div class="card">
+  <h2>Theorie und Hypothese</h2>
+  Zahlreiche Studien deuten darauf hin, dass soziale Ungleichheit mit geringerem Vertrauen in demokratische Institutionen zusammenhängt. So finden Goubin et. al. 2016, dass in europäischen Ländern höhere Einkommens- und soziale Ungleichheit tendenziell mit niedrigeren politischen Vertrauenswerten einhergeht. Wenn Bürger wahrnehmen, dass Ressourcen ungleich verteilt sind und Chancen ungleich sind, neigen sie dazu, dem politischen System weniger zu vertrauen. Auch Schäfer 2010 findet in einer Mehrebenenanalyse Hinweise darauf, dass Institutionenvertrauen in ungleicheren Ländern geringer ausfällt. Ebenso zeigen Forschungen von Sani und Magistro 2016, dass insbesondere wirtschaftliche Krisen bestehende soziale Ungleichheiten verstärken und mit einem stärkeren Vertrauensverlust sozial benachteiligter Gruppen verbunden sind. Diese Befunde bilden die theoretische Grundlage unserer Analyse.
+   <br><br>
+  <strong>
+  H1: Eine hohe soziale Ungleichheit führt zu abnehmendem Vertrauen in demokratische Institutionen in Europa.
+  </strong>
+</div>
+
+<div class="card">
+  <h2>Daten und Variablen</h2>
+  Für die empirische Analyse wurden Daten aus zwei verschiedenen Quellen kombiniert. Das Vertrauen in demokratische Institutionen wird mithilfe von drei Variablen aus der European Social Survey (ESS) Runde 10 (2020-2022) auf einer Skala von 0 (kein Vertrauen) bis 10 (völliges Vertrauen) gemessen:
+   <br><br>
+  <ul>
+    <li><strong>trstprl</strong> (trust in country's parliament)</li>
+    <li><strong>trstprt</strong> (trust in political parties)</li>
+    <li><strong>trstep</strong> (trust in the European Parliament)</li>
+  </ul>
+  Für jede dieser abhängigen Variablen wurden separate Modelle geschätzt.
+   <br><br>
+  Das Vertrauen in politische Institutionen wird im ESS mittels standardisierter Single-Item-Fragen gemessen. Diese erlauben keine klassische Prüfung interner Reliabilität, weisen jedoch aufgrund ihrer inhaltlichen Klarheit und der umfangreichen Vorvalidierung des ESS eine hohe Vergleichbarkeit auf.
+   <br><br>
+  Die zentrale unabhängige Variable zur Messung sozialer Ungleichheit ist der Gini-Koeffizient der verfügbaren Einkommen aus dem Comparative Political Data Set. Pro Land wurde jeweils ein Gini-Wert in den kombinierten Datensatz integriert. Als Kontrollvariablen wurden das Alter sowie die Anzahl der Bildungsjahre verwendet, die ebenfalls aus dem ESS stammen. Zusätzlich wurden die Analysegewichte des ESS (anweight) verwendet.
+</div>
+
+<div class="card">
+  <h2>Methodologie</h2>
+  Der verwendete Datensatz basiert hauptsächlich auf dem ESS, welcher eine hierarchische Struktur aufweist. Die individuellen Beobachtungen sind Ländern zugeordnet. Aus diesem Grund wurden lineare Mehrebenenmodelle mit zufälligen Länder-Intercepts geschätzt, die länderspezifische Unterschiede im durchschnittlichen politischen Vertrauen berücksichtigen. Als Kontrolle wurde für jede abhängige Variable ein Nullmodell (intercept-only) berechnet. Die Intraclass-Korrelationen (ICC) dieser zeigen, dass sich je nach Institution zwischen 5 % und 20 % der Varianz im politischen Vertrauen auf länderspezifische Unterschiede zurückführen lassen. Dies zeigt, dass die Verwendung von Mehrebenenmodellen geeignet ist. Der untenstehende Plot zeigt den Anteil der Varianz im politischen Vertrauen auf Länderebene (ICC) und Individualebene, basierend auf den Nullmodellen.
+       <br><br>
+   <img src="images/icc_plot.jpg"
+     alt="Icc-Plot"
+     style="display:block; max-width:100%; height:auto; margin:12px auto 0 auto;">
+   <br><br>
+  Zusätzlich wurden alternative Modellspezifikationen berechnet: mit und ohne Interaktion zwischen Ungleichheit und Erhebungsjahr des Gini-Koeffizienten, mit zufälligen Steigungen für Einkommensungleichheit, sowie ohne Kontrollvariablen.
+   <br><br>
+  Ein Vergleich der Modelle anhand von Likelihood-basierten Gütemassen (AIC und BIC) zeigt, dass das ursprüngliche Modell mit dem Gini-Koeffizienten als unabhängiger Variable und den Kontrollvariablen Alter und Bildungsjahre die beste Modellgüte aufweist.
+</div>
+
+<div class="card">
+  <h2>Ergebnisse</h2>
+  <img src="images/koeffizientenplot_mehrebenenmodell.jpg" alt="Koeffizientenplot Mehrebenenmodell" style="margin-bottom: 12px;">
+     <br><br>
+  Die Ergebnisse der Mehrebenenanalysen zeigen keinen robusten statistischen Zusammenhang zwischen sozialer Ungleichheit und dem Vertrauen in demokratische Institutionen. In keinem der geschätzten Basismodelle weist der Gini-Koeffizient einen signifikanten Effekt auf das Vertrauen in das nationale Parlament, politische Parteien oder das Europäische Parlament auf. Dieser Befund ist konsistent über alle drei abhängigen Variablen hinweg.
+   <br><br>
+  Die Kontrollvariablen zeigen hingegen stabile Zusammenhänge: Höhere Bildungsjahre gehen durchgehend mit höherem politischem Vertrauen einher. Für das Alter zeigen sich institutionenspezifische Effekte. Während höheres Alter mit einem leicht höheren Vertrauen in das nationale Parlament verbunden ist, geht es mit geringerem Vertrauen in das Europäische Parlament einher. Die Effektgrössen des Alters sind jedoch insgesamt sehr klein.
+   <br><br>
+  Insgesamt deuten die Ergebnisse darauf hin, dass die untersuchten individuellen Merkmale, insbesondere Bildungsjahre, eine grössere Rolle für politisches Vertrauen spielen als makrostrukturelle Einkommensungleichheit, zumindest in den hier untersuchten europäischen Ländern.
+   <br><br>
+  Zusätzliche Modellspezifikationen bestätigen diesen Befund. Weder die Aufnahme eines Interaktionsterms zwischen Ungleichheit und Erhebungsjahr des Gini-Koeffizienten noch die Spezifikation zufälliger Steigungen für Ungleichheit führen zu einer Verbesserung der Modellgüte oder zu substanziell veränderten Ergebnissen.
+  <div style="height: 10mm;"></div>
+</div>
+
+<div class="card">
+  <h2>Konklusion</h2>
+  Die Analyse liefert keinen robusten empirischen Beleg für einen systematischen Zusammenhang zwischen sozialer Einkommensungleichheit und dem Vertrauen in demokratische Institutionen in Europa. Die aufgestellte Hypothese eines negativen Effekts sozialer Ungleichheit wird somit nicht bestätigt. 
+   <br><br> 
+   Stattdessen erweisen sich individuelle Merkmale, insbesondere Bildung, als zentraler für politisches Vertrauen. Dies deutet darauf hin, dass institutionelle und wahrnehmungsbezogene Faktoren eine grössere Rolle spielen als objektive Ungleichheit allein. Dass diese Ergebnisse von der betrachteten Literatur abweichen, lässt sich sowohl durch unterschiedliche untersuchte Zeitpunkte als auch durch die unterschiedlichen Modellspezifikationen erklären. Während frühere Studien oft aggregierte Vertrauensindikatoren oder breitere Makro-Modelle verwenden, zeigt sich in dieser Analyse mit Single-Item-Indikatoren kein robuster Effekt der Einkommensungleichheit.
+</div>
+
+<div class="card">
+  <h2>R-Code, Datenanalyse etc.</h2>
+  <img src="images/Github-QR.jpeg"
+     alt="Github QR-Code"
+     style="display:block; max-width:75%; height:auto; margin:0 auto 12px auto;">
+        <br><br> 
+<p>
+      <a class="poster-link"
+         href="https://github.com/JannikRichterUZH/Semesterarbeit-FS-2026-"
+         target="_blank">
+        GitHub-Repository zur Semesterarbeit
+      </a>
+      </p>
+</div>
+
+<div class="footer">
+  <div class="footer-inner"></div>
+</div>
+
+   </div> <!-- .flow -->
+</div>   <!-- .poster-wrap -->
+```
